@@ -1,0 +1,80 @@
+const express = require('express')
+const bodyParser = require('body-parser')
+const app = express()
+const port = 3000
+
+app.use(bodyParser.json())
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+)
+
+const { Pool } = require('pg');
+const dotenv = require('dotenv');
+dotenv.config();
+// console.log(`...... ENV -> Database_URL:${process.env.DATABASE_URL},  USER:${process.env.DB_USER}, PASS:${process.env.DB_PASS}`)
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
+});
+
+pool.on('connect', () => {
+  console.log('-----> connected to the db \n');
+});
+
+// Root route for home page with some json info.
+app.get('/', (req, res) => {
+  res.json({ info: 'Node.js, Express, and Postgres API' })
+})
+// pool.query('SELECT * FROM macbook', (err, res) => {
+//   console.log(res.rows)
+//   pool.end()
+// })
+
+//==> Query a table
+// (async () => {
+//   // const { rows } = await pool.query('SELECT * FROM macbook WHERE id = $1', [3])
+//   const { rows } = await pool.query('SELECT * FROM macbook');
+//   console.log(rows);
+//   await pool.end();
+// })().catch(err => setImmediate(() => { throw err }))
+
+// GET route request on the /info URL, and return all table information.
+app.get('/info', (req, res) => {
+  (async () => {
+    const { rows } = await pool.query('SELECT * FROM macbook');
+    console.log(rows);
+    await res.send(JSON.stringify(rows));
+  })().catch(err => setImmediate(() => { throw err }));  
+})
+
+// GET route request on the /info/:id/:name URL, and return the info by custom id & name. 
+app.get('/info/:id/:name', (req, res) => {
+  const id = req.params.id;
+  const name = req.params.name;
+  (async () => {
+    // console.log(id, name);
+    const { rows } = await pool.query('SELECT * FROM macbook WHERE id = $1 AND name = $2', [id, name])
+    console.log(`Select query return: ${JSON.stringify(rows)}`);
+    await res.send(JSON.stringify(rows[0]));
+  })().catch(err => setImmediate(() => { throw err }));  
+})
+
+// POST route request to add a new item with price
+app.post('/info', (req, res) => {
+  // const name = req.body.name;
+  // const price = req.body.price;
+  const {name, price} = req.body;
+  (async () => {
+    // console.log(`name: ${name}, price: ${price}`)
+    const { content } = await pool.query('INSERT INTO macbook (name, price) VALUES ($1, $2)', [name, price]);
+    console.log(`Insert query return: ${JSON.stringify(content)}`)
+  })().catch(err => setImmediate(() => { throw err }));  
+  
+})
+
+// Now set the app to listen on the port you set.
+app.listen(port, () => {
+   console.log(`App running on port ${port}.`)
+})
