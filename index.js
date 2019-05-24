@@ -74,6 +74,13 @@ app.post('/info', (req, res) => {
   
 })
 
+// PUT route request to Update the user with id 
+app.put('/info', (req, res) =>{
+  
+})
+
+
+
 // Now set the app to listen on the port you set.
 app.listen(port, () => {
    console.log(`App running on port ${port}.`)
