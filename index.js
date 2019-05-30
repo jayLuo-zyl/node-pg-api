@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 app.get('/info', (req, res) => {
   (async () => {
     const { rows } = await pool.query('SELECT * FROM macbook');
-    console.log(rows);
+    console.log('Select * query return:', rows);
     res.send(JSON.stringify(rows));
   })().catch(err => setImmediate(() => { throw err }));  
 })
