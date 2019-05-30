@@ -27,18 +27,6 @@ pool.on('connect', () => {
 app.get('/', (req, res) => {
   res.json({ info: 'Node.js, Express, and Postgres API' })
 })
-// pool.query('SELECT * FROM macbook', (err, res) => {
-//   console.log(res.rows)
-//   pool.end()
-// })
-
-//==> Query a table
-// (async () => {
-//   // const { rows } = await pool.query('SELECT * FROM macbook WHERE id = $1', [3])
-//   const { rows } = await pool.query('SELECT * FROM macbook');
-//   console.log(rows);
-//   await pool.end();
-// })().catch(err => setImmediate(() => { throw err }))
 
 // GET route request on the /info URL, and return all table information.
 app.get('/info', (req, res) => {
