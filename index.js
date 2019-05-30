@@ -45,7 +45,7 @@ app.get('/info', (req, res) => {
   (async () => {
     const { rows } = await pool.query('SELECT * FROM macbook');
     console.log(rows);
-    await res.send(JSON.stringify(rows));
+    res.send(JSON.stringify(rows));
   })().catch(err => setImmediate(() => { throw err }));  
 })
 
@@ -57,7 +57,7 @@ app.get('/info/:id/:name', (req, res) => {
     // console.log(id, name);
     const { rows } = await pool.query('SELECT * FROM macbook WHERE id = $1 AND name = $2', [id, name])
     console.log(`Select query return: ${JSON.stringify(rows)}`);
-    await res.send(JSON.stringify(rows[0]));
+    res.send(JSON.stringify(rows[0]));
   })().catch(err => setImmediate(() => { throw err }));  
 })
 
@@ -70,13 +70,21 @@ app.post('/info', (req, res) => {
     // console.log(`name: ${name}, price: ${price}`)
     const { content } = await pool.query('INSERT INTO macbook (name, price) VALUES ($1, $2)', [name, price]);
     console.log(`Insert query return: ${JSON.stringify(content)}`)
+    res.send(content)
   })().catch(err => setImmediate(() => { throw err }));  
   
 })
 
 // PUT route request to Update the user with id 
-app.put('/info', (req, res) =>{
-  
+app.put('/info/:id', (req, res) =>{
+  const id = parseInt(req.params.id);
+  const {name, price} = req.body;
+  (async ()=> {
+    // console.log(`id: ${id}`)
+    const {row} = await pool.query('UPDATE macbook SET name = $1, price = $2 WHERE id = $3', [name, price, id]);
+    console.log(`Update query return: ${row}`)
+    res.send(row)
+  })().catch(err=> setImmediate(()=>{ throw err }));
 })
 
 
