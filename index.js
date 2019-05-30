@@ -56,7 +56,7 @@ app.post('/info', (req, res) => {
   (async () => {
     const { content } = await pool.query('INSERT INTO macbook (name, price) VALUES ($1, $2)', [name, price]);
     console.log(`Insert query return: ${JSON.stringify(content)}`)
-    res.send(`User added with ID`)
+    res.send(`Info added with ID`)
   })().catch(err => setImmediate(() => { throw err }));  
   
 })
@@ -68,7 +68,7 @@ app.put('/info/:id', (req, res) => {
   (async ()=> {
     const {row} = await pool.query('UPDATE macbook SET name = $1, price = $2 WHERE id = $3', [name, price, id]);
     console.log(`Update query return: ${row}`)
-    res.send(`User modified with ID: ${id}\n`)
+    res.send(`Info modified with ID: ${id}\n`)
   })().catch(err=> setImmediate(()=>{ throw err }));
 })
 
@@ -78,7 +78,7 @@ app.delete('/info/:id', (req, res) => {
   (async ()=> {
     const {row}= await pool.query('DELETE FROM macbook WHERE id = $1', [id]);
     console.log(`Delete query return: ${row}`)
-    res.send(`User deleted with ID: ${id}\n`)
+    res.send(`Info deleted with ID: ${id}\n`)
   })().catch(err=> setImmediate(()=>{ throw err }));
 })
 
