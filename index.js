@@ -42,7 +42,6 @@ app.get('/info/:id/:name', (req, res) => {
   const id = req.params.id;
   const name = req.params.name;
   (async () => {
-    // console.log(id, name);
     const { rows } = await pool.query('SELECT * FROM macbook WHERE id = $1 AND name = $2', [id, name])
     console.log(`Select query return: ${JSON.stringify(rows)}`);
     res.send(JSON.stringify(rows[0]));
@@ -55,26 +54,33 @@ app.post('/info', (req, res) => {
   // const price = req.body.price;
   const {name, price} = req.body;
   (async () => {
-    // console.log(`name: ${name}, price: ${price}`)
     const { content } = await pool.query('INSERT INTO macbook (name, price) VALUES ($1, $2)', [name, price]);
     console.log(`Insert query return: ${JSON.stringify(content)}`)
-    res.send(content)
+    res.send(`User added with ID`)
   })().catch(err => setImmediate(() => { throw err }));  
   
 })
 
 // PUT route request to Update the user with id 
-app.put('/info/:id', (req, res) =>{
+app.put('/info/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const {name, price} = req.body;
   (async ()=> {
-    // console.log(`id: ${id}`)
     const {row} = await pool.query('UPDATE macbook SET name = $1, price = $2 WHERE id = $3', [name, price, id]);
     console.log(`Update query return: ${row}`)
-    res.send(row)
+    res.send(`User modified with ID: ${id}\n`)
   })().catch(err=> setImmediate(()=>{ throw err }));
 })
 
+// DELETE route request to delete a specific user by id. 
+app.delete('/info/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  (async ()=> {
+    const {row}= await pool.query('DELETE FROM macbook WHERE id = $1', [id]);
+    console.log(`Delete query return: ${row}`)
+    res.send(`User deleted with ID: ${id}\n`)
+  })().catch(err=> setImmediate(()=>{ throw err }));
+})
 
 
 // Now set the app to listen on the port you set.
