@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
 const port = 3000
+const db = require('./queries')
 
 app.use(bodyParser.json())
 app.use(
@@ -10,77 +11,25 @@ app.use(
   })
 )
 
-const { Pool } = require('pg');
-const dotenv = require('dotenv');
-dotenv.config();
-// console.log(`...... ENV -> Database_URL:${process.env.DATABASE_URL},  USER:${process.env.DB_USER}, PASS:${process.env.DB_PASS}`)
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
-});
-
-pool.on('connect', () => {
-  console.log('-----> connected to the db \n');
-});
-
 // Root route for home page with some json info.
 app.get('/', (req, res) => {
   res.json({ info: 'Node.js, Express, and Postgres API' })
 })
 
 // GET route request on the /info URL, and return all table information.
-app.get('/info', (req, res) => {
-  (async () => {
-    const { rows } = await pool.query('SELECT * FROM macbook');
-    console.log('Select * query return:', rows);
-    res.send(JSON.stringify(rows));
-  })().catch(err => setImmediate(() => { throw err }));  
-})
+app.get('/info', db.getInfo)
 
-// GET route request on the /info/:id/:name URL, and return the info by custom id & name. 
-app.get('/info/:id/:name', (req, res) => {
-  const id = req.params.id;
-  const name = req.params.name;
-  (async () => {
-    const { rows } = await pool.query('SELECT * FROM macbook WHERE id = $1 AND name = $2', [id, name])
-    console.log(`Select query return: ${JSON.stringify(rows)}`);
-    res.send(JSON.stringify(rows[0]));
-  })().catch(err => setImmediate(() => { throw err }));  
-})
+// GET route request on the /info/:id/:name URL, and return the price by custom id & name. 
+app.get('/info/:id/:name', db.getInfoByID)
 
 // POST route request to add a new item with price
-app.post('/info', (req, res) => {
-  // const name = req.body.name;
-  // const price = req.body.price;
-  const {name, price} = req.body;
-  (async () => {
-    const { content } = await pool.query('INSERT INTO macbook (name, price) VALUES ($1, $2)', [name, price]);
-    console.log(`Insert query return: ${JSON.stringify(content)}`)
-    res.send(`Info added with ID`)
-  })().catch(err => setImmediate(() => { throw err }));  
-  
-})
+app.post('/info', db.createItem)
 
 // PUT route request to Update the user with id 
-app.put('/info/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const {name, price} = req.body;
-  (async ()=> {
-    const {row} = await pool.query('UPDATE macbook SET name = $1, price = $2 WHERE id = $3', [name, price, id]);
-    console.log(`Update query return: ${row}`)
-    res.send(`Info modified with ID: ${id}\n`)
-  })().catch(err=> setImmediate(()=>{ throw err }));
-})
+app.put('/info/:id', db.updateItem)
 
 // DELETE route request to delete a specific user by id. 
-app.delete('/info/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  (async ()=> {
-    const {row}= await pool.query('DELETE FROM macbook WHERE id = $1', [id]);
-    console.log(`Delete query return: ${row}`)
-    res.send(`Info deleted with ID: ${id}\n`)
-  })().catch(err=> setImmediate(()=>{ throw err }));
-})
+app.delete('/info/:id', db.deleteItem)
 
 
 // Now set the app to listen on the port you set.
