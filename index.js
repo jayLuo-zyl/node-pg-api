@@ -31,7 +31,6 @@ app.put('/info/:id', db.updateItem)
 // DELETE route request to delete a specific user by id. 
 app.delete('/info/:id', db.deleteItem)
 
-
 // Now set the app to listen on the port you set.
 app.listen(port, () => {
    console.log(`App running on port ${port}.`)

@@ -6,10 +6,30 @@ dotenv.config();
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 });
+// pool.on('connect', () => {
+//   console.log('-----> connected to the db \n');  
+// });
 
-pool.on('connect', () => {
-  console.log('-----> connected to the db \n');
-});
+// Create the table if not exists.
+const queryText =
+`
+CREATE TABLE IF NOT EXISTS
+  reflections(
+    id UUID PRIMARY KEY,
+    success TEXT NOT NULL,
+    low_point TEXT NOT NULL,
+    take_away TEXT NOT NULL,
+    created_date TIMESTAMP,
+    modified_date TIMESTAMP
+  )
+`;
+const createTable =  () => {
+  (async () => {
+    const res = await pool.query(queryText)
+    console.log('Table Created.')
+  })().catch(err => setImmediate(() => { throw err })); 
+}
+createTable();
 
 // GET route request on the /info URL, and return all table information.
 const getInfo = (req, res) => {
@@ -68,6 +88,7 @@ const deleteItem = (req, res) => {
 }
 
 module.exports = {
+    createTable,
     getInfo,
     getInfoByID,
     createItem,
