@@ -1,6 +1,8 @@
 # node-pg-api
 
 run node index.js from terminal
+or
+npm run start
 
 using curl to work like front-end input:
 
