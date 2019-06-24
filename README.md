@@ -2,6 +2,10 @@
 
 run node index.js from terminal
 
+or 
+
+npm run start
+
 using curl to work like front-end input:
 
   curl --data "name=Plant&price=18.99" http://localhost:3000/info
